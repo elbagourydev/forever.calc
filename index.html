@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة سعر مراتب السرير</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        select, button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #f1f9ff;
+            text-align: center;
+            font-size: 18px;
+            display: none;
+        }
+        .price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .memory-foam-option {
+            display: none;
+        }
+        .prices-table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+        }
+        .prices-table th, .prices-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        .prices-table th {
+            background-color: #f2f2f2;
+        }
+        .prices-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+            border-radius: 5px 5px 0 0;
+        }
+        .tab button {
+            background-color: inherit;
+            float: right;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 10px 16px;
+            transition: 0.3s;
+            font-size: 16px;
+            margin-top: 0;
+        }
+        .tab button:hover {
+            background-color: #ddd;
+        }
+        .tab button.active {
+            background-color: #3498db;
+            color: white;
+        }
+        .tabcontent {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>حاسبة سعر مراتب السرير</h1>
+        
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'calculatorTab')">الحاسبة</button>
+            <button class="tablinks" onclick="openTab(event, 'priceListTab')">قائمة الأسعار</button>
+        </div>
+        
+        <div id="calculatorTab" class="tabcontent" style="display: block;">
+            <div class="form-group">
+                <label for="mattressType">نوع المرتبة:</label>
+                <select id="mattressType" onchange="updateHeightOptions(); updateMemoryFoamVisibility();">
+                    <option value="medical">المرتبة الطبية</option>
+                    <option value="semiMedical">النص طبية</option>
+                    <option value="springs">السوست المنفصلة</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="height">ارتفاع المرتبة:</label>
+                <select id="height">
+                    <option value="20">20 سم</option>
+                    <option value="25">25 سم</option>
+                    <option value="30">30 سم</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="width">عرض المرتبة:</label>
+                <select id="width">
+                    <option value="100">100 سم</option>
+                    <option value="120">120 سم</option>
+                    <option value="150">150 سم</option>
+                    <option value="160">160 سم</option>
+                    <option value="170">170 سم</option>
+                    <option value="180">180 سم</option>
+                </select>
+            </div>
+            
+            <div class="form-group memory-foam-option" id="memoryFoamGroup">
+                <label for="memoryFoam">إضافة طبقة ميموري فوم:</label>
+                <select id="memoryFoam">
+                    <option value="no">لا</option>
+                    <option value="yes">نعم</option>
+                </select>
+            </div>
+            
+            <button onclick="calculatePrice()">احسب السعر</button>
+            
+            <div class="result" id="result">
+                <h3>سعر المرتبة:</h3>
+                <div class="price" id="price">0 جنيه</div>
+                <p id="priceDetails"></p>
+            </div>
+        </div>
+        
+        <div id="priceListTab" class="tabcontent">
+            <h2>قائمة أسعار المراتب</h2>
+            
+            <h3>المرتبة الطبية</h3>
+            <table class="prices-table">
+                <tr>
+                    <th>المقاس</th>
+                    <th>ارتفاع 20 سم</th>
+                    <th>ارتفاع 25 سم</th>
+                    <th>ارتفاع 30 سم</th>
+                    <th>ارتفاع 20 سم + ميموري</th>
+                    <th>ارتفاع 25 سم + ميموري</th>
+                    <th>ارتفاع 30 سم + ميموري</th>
+                </tr>
+                <tr>
+                    <td>100 سم</td>
+                    <td>3,100 ج</td>
+                    <td>3,500 ج</td>
+                    <td>4,000 ج</td>
+                    <td>5,100 ج</td>
+                    <td>5,500 ج</td>
+                    <td>6,000 ج</td>
+                </tr>
+                <tr>
+                    <td>120 سم</td>
+                    <td>3,720 ج</td>
+                    <td>4,200 ج</td>
+                    <td>4,800 ج</td>
+                    <td>5,720 ج</td>
+                    <td>6,200 ج</td>
+                    <td>6,800 ج</td>
+                </tr>
+                <tr>
+                    <td>150 سم</td>
+                    <td>4,650 ج</td>
+                    <td>5,250 ج</td>
+                    <td>6,000 ج</td>
+                    <td>7,150 ج</td>
+                    <td>7,750 ج</td>
+                    <td>8,500 ج</td>
+                </tr>
+                <tr>
+                    <td>160 سم</td>
+                    <td>4,960 ج</td>
+                    <td>5,600 ج</td>
+                    <td>6,400 ج</td>
+                    <td>7,460 ج</td>
+                    <td>8,100 ج</td>
+                    <td>8,900 ج</td>
+                </tr>
+                <tr>
+                    <td>170 سم</td>
+                    <td>5,270 ج</td>
+                    <td>5,950 ج</td>
+                    <td>6,800 ج</td>
+                    <td>7,770 ج</td>
+                    <td>8,450 ج</td>
+                    <td>9,300 ج</td>
+                </tr>
+                <tr>
+                    <td>180 سم</td>
+                    <td>5,580 ج</td>
+                    <td>6,300 ج</td>
+                    <td>7,200 ج</td>
+                    <td>8,080 ج</td>
+                    <td>8,800 ج</td>
+                    <td>9,700 ج</td>
+                </tr>
+            </table>
+            
+            <h3>النص طبية</h3>
+            <table class="prices-table">
+                <tr>
+                    <th>المقاس</th>
+                    <th>ارتفاع 25 سم</th>
+                    <th>ارتفاع 30 سم</th>
+                </tr>
+                <tr>
+                    <td>100 سم</td>
+                    <td>2,500 ج</td>
+                    <td>3,000 ج</td>
+                </tr>
+                <tr>
+                    <td>120 سم</td>
+                    <td>3,000 ج</td>
+                    <td>3,600 ج</td>
+                </tr>
+                <tr>
+                    <td>150 سم</td>
+                    <td>3,750 ج</td>
+                    <td>4,500 ج</td>
+                </tr>
+                <tr>
+                    <td>160 سم</td>
+                    <td>4,000 ج</td>
+                    <td>4,800 ج</td>
+                </tr>
+                <tr>
+                    <td>170 سم</td>
+                    <td>4,250 ج</td>
+                    <td>5,100 ج</td>
+                </tr>
+                <tr>
+                    <td>180 سم</td>
+                    <td>4,500 ج</td>
+                    <td>5,400 ج</td>
+                </tr>
+            </table>
+            
+            <h3>السوست المنفصلة</h3>
+            <table class="prices-table">
+                <tr>
+                    <th>المقاس</th>
+                    <th>ارتفاع 30 سم</th>
+                    <th>ارتفاع 30 سم + ميموري</th>
+                </tr>
+                <tr>
+                    <td>100 سم</td>
+                    <td>4,000 ج</td>
+                    <td>6,000 ج</td>
+                </tr>
+                <tr>
+                    <td>120 سم</td>
+                    <td>4,800 ج</td>
+                    <td>6,800 ج</td>
+                </tr>
+                <tr>
+                    <td>150 سم</td>
+                    <td>6,000 ج</td>
+                    <td>8,500 ج</td>
+                </tr>
+                <tr>
+                    <td>160 سم</td>
+                    <td>6,400 ج</td>
+                    <td>8,900 ج</td>
+                </tr>
+                <tr>
+                    <td>170 سم</td>
+                    <td>6,800 ج</td>
+                    <td>9,300 ج</td>
+                </tr>
+                <tr>
+                    <td>180 سم</td>
+                    <td>7,200 ج</td>
+                    <td>9,700 ج</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // تحديث خيارات الارتفاع بناءً على نوع المرتبة
+        function updateHeightOptions() {
+            const mattressType = document.getElementById('mattressType').value;
+            const heightSelect = document.getElementById('height');
+            
+            // مسح الخيارات الحالية
+            while (heightSelect.options.length > 0) {
+                heightSelect.remove(0);
+            }
+            
+            // إضافة الخيارات المناسبة
+            if (mattressType === 'medical') {
+                addOption(heightSelect, '20', '20 سم');
+                addOption(heightSelect, '25', '25 سم');
+                addOption(heightSelect, '30', '30 سم');
+            } else if (mattressType === 'semiMedical') {
+                addOption(heightSelect, '25', '25 سم');
+                addOption(heightSelect, '30', '30 سم');
+            } else if (mattressType === 'springs') {
+                addOption(heightSelect, '30', '30 سم');
+            }
+        }
+        
+        // إضافة خيار جديد للقائمة المنسدلة
+        function addOption(selectElement, value, text) {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = text;
+            selectElement.add(option);
+        }
+        
+        // تحديث ظهور خيار الميموري فوم
+        function updateMemoryFoamVisibility() {
+            const mattressType = document.getElementById('mattressType').value;
+            const memoryFoamGroup = document.getElementById('memoryFoamGroup');
+            
+            if (mattressType === 'medical' || mattressType === 'springs') {
+                memoryFoamGroup.style.display = 'block';
+            } else {
+                memoryFoamGroup.style.display = 'none';
+            }
+        }
+        
+        // حساب السعر
+        function calculatePrice() {
+            const mattressType = document.getElementById('mattressType').value;
+            const height = parseInt(document.getElementById('height').value);
+            const width = parseInt(document.getElementById('width').value);
+            const memoryFoam = document.getElementById('memoryFoam').value;
+            
+            let basePricePerMeter = 0;
+            let memoryFoamPrice = 0;
+            let finalPrice = 0;
+            let details = [];
+            
+            // تحديد السعر الأساسي للمتر
+            if (mattressType === 'medical') {
+                if (height === 20) basePricePerMeter = 3100;
+                else if (height === 25) basePricePerMeter = 3500;
+                else if (height === 30) basePricePerMeter = 4000;
+            } else if (mattressType === 'semiMedical') {
+                if (height === 25) basePricePerMeter = 2500;
+                else if (height === 30) basePricePerMeter = 3000;
+            } else if (mattressType === 'springs') {
+                basePricePerMeter = 4000; // نفس سعر الطبي ارتفاع 30
+            }
+            
+            // حساب السعر الأساسي
+            const basePrice = basePricePerMeter * width / 100;
+            details.push(`السعر الأساسي: ${basePricePerMeter} × ${width / 100} = ${basePrice} جنيه`);
+            finalPrice = basePrice;
+            
+            // إضافة سعر الميموري فوم إذا تم اختياره
+            if ((mattressType === 'medical' || mattressType === 'springs') && memoryFoam === 'yes') {
+                memoryFoamPrice = width <= 120 ? 2000 : 2500;
+                details.push(`سعر طبقة الميموري فوم: ${memoryFoamPrice} جنيه`);
+                finalPrice += memoryFoamPrice;
+            }
+            
+            // عرض النتيجة
+            document.getElementById('price').textContent = `${finalPrice.toLocaleString()} جنيه`;
+            document.getElementById('priceDetails').innerHTML = details.join('<br>');
+            document.getElementById('result').style.display = 'block';
+        }
+        
+        // التبديل بين التبويبات
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            
+            // إخفاء كل محتويات التبويبات
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            
+            // إزالة التنشيط من كل أزرار التبويبات
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            
+            // عرض التبويب الحالي وتنشيط الزر الخاص به
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+        
+        // تهيئة الصفحة عند التحميل
+        window.onload = function() {
+            updateHeightOptions();
+            updateMemoryFoamVisibility();
+        };
+    </script>
+</body>
+</html>
